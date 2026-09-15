@@ -1,36 +1,107 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://github.com/diegocandido/) 
+# API Fake Blog
 
+Base original por [Diego Candido](https://diegocandido.com), atualizada com:
 
-# API ESTUDO
+- Categorias funcionando de verdade (antes só existia uma rota fixa e quebrada para "games")
+- Rota para editar postagens (PUT)
+- Rota para criar e deletar postagens
+- Persistência em banco de dados real usando **Supabase** (Postgres), no lugar dos arrays fixos em `models/articles.js` e `models/games.js`
 
-Por [Diego Candido](https://diegocandido.com)
+## Configurando o Supabase
 
-Montei esse projeto bem básico para usar várias tecnologias de front-end em sala de aula e testar o conhecimento na prática de consumir algo real e publicado. 
-
-O vídeo explicativo de como fazer algo semelhante está no [YouTube](https://www.youtube.com/watch?v=QVgRQ7fIZ_c) com todos os detalhes.
-
-
-## URLs do projeto
-
-Esse projeto está publicado no Heroku.
-
-## Para listar TODAS as postagens:
+1. Crie um projeto em [supabase.com](https://supabase.com).
+2. Vá em **SQL Editor** e rode o conteúdo do arquivo `schema.sql` deste projeto. Isso cria a tabela `posts` e já insere alguns dados de exemplo.
+3. Vá em **Project Settings > API** e copie a **Project URL** e a **anon public key** (ou a `service_role` key, se for usar só no back-end).
+4. Copie `.env.example` para `.env` e preencha:
 
 ```
-https://api-fake-blog.onrender.com/postagens/
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_KEY=SUA_CHAVE
 ```
 
-## Para listar UMA postagem:
+## Instalando e rodando
 
 ```
-https://api-fake-blog.onrender.com/postagem/1
+npm install
+npm start
 ```
 
+## Rotas disponíveis
 
-## Clonando o Repositório ##
-Com o Git e o Node.js instalado na sua maquina e a **URL** do projeto em mãos, cria em algum lugar do seu pc uma pasta para criarmos uma copia do repositório, dentro dela abra o **cmd** ou **powershell** e digite os comandos abaixo:
+### Listar todas as postagens
 ```
-git clone https://github.com/diegocandido/api-fake-blog.git
+GET /postagens
+```
+
+### Buscar uma postagem pelo id
+```
+GET /postagem/:id
+```
+
+### Listar todas as categorias existentes
+```
+GET /categorias
+```
+
+### Listar postagens de uma categoria
+```
+GET /categoria/:nome
+```
+Exemplo: `/categoria/games`
+
+### Criar uma nova postagem
+```
+POST /postagem
+Content-Type: application/json
+
+{
+  "titulo": "Meu novo post",
+  "descricao": "Texto do post",
+  "categoria": "games",
+  "thumbImage": "https://...",
+  "thumbImageAltText": "Descrição da imagem",
+  "profileThumbImage": "/images/profile-1.jpg",
+  "profileName": "Seu Nome",
+  "postDate": "2026-09-14"
+}
+```
+Apenas `titulo` e `descricao` são obrigatórios; os demais campos são opcionais.
+
+### Editar uma postagem existente
+```
+PUT /postagem/:id
+Content-Type: application/json
+
+{
+  "titulo": "Título atualizado",
+  "categoria": "tecnologia"
+}
+```
+Envie apenas os campos que quer alterar — os demais permanecem como estavam.
+
+### Deletar uma postagem
+```
+DELETE /postagem/:id
+```
+
+## Estrutura do projeto
+
+```
+app.js                      -> rotas da API
+config/supabaseClient.js    -> conexão com o Supabase
+models/posts.js             -> todas as consultas/operações na tabela "posts"
+schema.sql                  -> script para criar a tabela no Supabase
+public/images               -> imagens estáticas servidas em /img
+```
+
+## Clonando o repositório
+
+Com o Git e o Node.js instalados, e a **URL** do projeto em mãos:
+```
+git clone <url-do-repositorio>
 cd api-fake-blog
 npm install
+cp .env.example .env
+# preencha o .env com os dados do seu projeto Supabase
+npm start
 ```
