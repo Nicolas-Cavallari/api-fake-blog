@@ -34,6 +34,34 @@ before update on posts
 for each row
 execute function set_updated_at();
 
+-- ============================================================================
+-- Usuários (cadastro/login) e comentários — adicionado junto com as rotas de
+-- autenticação, comentários e edição restrita ao autor da postagem.
+-- Todo o bloco abaixo é seguro para rodar de novo num projeto que já tem a
+-- tabela "posts" criada: só adiciona o que ainda não existe.
+-- ============================================================================
+
+create table if not exists usuarios (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  email text not null unique,
+  senha_hash text not null,
+  created_at timestamptz not null default now()
+);
+
+-- Dono da postagem (nulo nas postagens de exemplo antigas, que não têm autor)
+alter table posts add column if not exists autor_id bigint references usuarios(id);
+
+create table if not exists comentarios (
+  id bigint generated always as identity primary key,
+  postagem_id bigint not null references posts(id) on delete cascade,
+  autor_id bigint not null references usuarios(id),
+  texto text not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_comentarios_postagem on comentarios (postagem_id);
+
 -- Dados de exemplo (equivalentes aos que estavam fixos em models/articles.js e models/games.js)
 insert into posts (titulo, descricao, categoria, thumb_image, thumb_image_alt_text, profile_thumb_image, profile_name, post_date) values
 ('Google Notícias completa 20 anos com redesign e fundo de apoio ao jornalismo independente',

@@ -57,6 +57,7 @@ async function create(post) {
     profileThumbImage,
     profileName,
     postDate,
+    autorId,
   } = post
 
   const { data, error } = await supabase
@@ -71,6 +72,7 @@ async function create(post) {
         profile_thumb_image: profileThumbImage,
         profile_name: profileName,
         post_date: postDate,
+        autor_id: autorId,
       },
     ])
     .select()
